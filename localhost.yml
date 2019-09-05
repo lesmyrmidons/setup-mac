@@ -1,0 +1,247 @@
+- hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    local_home: "{{ lookup('env','HOME') }}"
+    mas_signin_dialog: true
+    extra_path: $HOME/.phpenv/bin
+
+    repos_git:
+      - { src: "https://github.com/lesmyrmidons/dotfiles.git", dest: "~/.setup/dotfile" }
+      - { src: "https://github.com/lesmyrmidons/zsh-config.git", dest: "~/.setup/zsh_config" }
+      # - { src: "https://github.com/lesmyrmidons/vim-config.git", dest: "~/.setup/vim_config"}
+    
+    zsh_config:
+      symlink_script: "sh ~/.setup/zsh_config/setup.sh -f"
+
+    homebrew_taps:
+      - homebrew/cask-drivers
+      - homebrew/cask-fonts
+
+    homebrew_packages:
+      - { name: antiword }
+      - { name: git }
+      - { name: zsh }
+      - { name: zsh-completions }
+      - { name: wget }
+      - { name: tig }
+      - { name: ssh-copy-id }
+      - { name: lastpass-cli }
+      - { name: tmux }
+      - { name: tree }
+      - { name: unrar }
+      - { name: composer }
+      - { name: gcc }
+      - { name: mas }
+      - { name: screenfetch }
+      - { name: php }
+      - { name: getantibody/tap/antibody }
+      - { name: httpie }
+
+    homebrew_cask_packages:
+      - alfred
+      - appcleaner
+      - vagrant
+      - virtualbox
+      - virtualbox-extension-pack
+      - jetbrains-toolbox
+      - visual-studio-code
+      - vlc
+      - docker
+      - libreoffice
+      - google-backup-and-sync
+      - google-chrome
+      - google-drive-file-stream
+      - firefox
+      - tunnelblick
+      - postman
+      - iterm2
+      - bettertouchtool
+      - skype
+      - slack
+      - lastpass
+      - font-hack-nerd-font
+
+    mas_packages:
+      - { name: Wunderlist, id: 410628904 }
+      - { name: Whatsapp, id: 1147396723 }
+      - { name: Termius, id: 1176074088 }
+      - { name: Any.do, id: 944960179 }
+      - { name: Trello, id: 1278508951 }
+      - { name: Xcode, id: 497799835 }
+
+    composer_packages:
+      - { name: "hirak/prestissimo" }
+      - { name: "psy/psysh" }
+
+    npm_packages:
+      - { name: "@angular/cli" }
+      - { name: bower }
+      - { name: coffee-script }
+      - { name: grunt }
+      - { name: grunt-cli }
+      - { name: gulp }
+      - { name: hubot }
+      - { name: karma }
+      - { name: less }
+      - { name: localtunnel }
+      - { name: n }
+      - { name: nativefier }
+      - { name: npm-check-updates }
+      - { name: typescript }
+      - { name: typings }
+      - { name: yarn }
+
+    php_configs:
+      # - { regexp: '^;? *(extension_dir) = ".*"',              replace: '\1 = ' }
+      - { regexp: '^;?(max_execution_time) *=.*$',            replace: '\1 = 0' }
+      - { regexp: '^;?(max_input_time) *=.*$',                replace: '\1 = -1' }
+      - { regexp: '^;?(memory_limit) *=.*$',                  replace: '\1 = 512M' }
+      - { regexp: '^;?(date.timezone) *=.*$',                 replace: '\1 = Europe/Paris' }
+      # - { regexp: '^;?(mbstring.language) *=.*$',             replace: '\1 = Japanese' }
+      # - { regexp: '^;?(pdo_mysql.default_socket) *=.*$',      replace: '\1 = /private/tmp/mysql.sock' }
+      # - { regexp: '^;?(always_populate_raw_post_data) *=.*$', replace: '\1 = -1' }   # tentative for php70
+      # - { regexp: '^;?(auto_detect_line_endings) *=.*$',      replace: '\1 = On' }
+
+    fonts_url:
+      - { url: https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Regular.ttf }
+      - { url: https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Bold.ttf }
+      - { url: https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Italic.ttf }
+      - { url: https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Bold%20Italic.ttf }
+
+    git_file:
+      - { src: ~/.setup/dotfile/gitconfig, dest: ~/.gitconfig }
+      - { src: ~/.setup/dotfile/gitignore_global, dest: ~/.gitignore_global }
+      - { src: ~/.setup/zsh_config/zshrc, dest: ~/.zshrc }
+      - { src: ~/.setup/zsh_config/zsh_aliases, dest: ~/.zsh_aliases }
+      - { src: ~/.setup/zsh_config/zsh_plugins.txt, dest: ~/.zsh_plugins.txt }
+
+  handlers:
+    - name: run fc-cache
+      shell: fc-cache -vf
+
+  tasks:
+    - name: install nvm
+      shell: |
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+      args:
+        creates: "{{ local_home }}/.nvm/nvm.sh"
+      tags:
+        - brew
+
+    # brew tap
+    - name: install taps of homebrew
+      homebrew_tap: tap="{{ item }}" state=present
+      with_items: "{{ homebrew_taps }}"
+      tags:
+        - brew
+
+    # brew update
+    - name: update homebrew
+      homebrew: update_homebrew=yes
+      tags:
+        - brew
+
+    # brew cask install
+    - name: install homebrew cask packages
+      homebrew_cask: name="{{ item }}" state=present
+      with_items: "{{ homebrew_cask_packages }}"
+      ignore_errors: true
+      tags:
+        - cask
+
+    # brew install
+    - name: install homebrew packages
+      homebrew: name="{{ item.name }}" state="{{ item.state|default('latest') }}" install_options="{{ item.install_options|default() }}"
+      with_items: "{{ homebrew_packages }}"
+      tags:
+        - brew
+
+    # configure zsh
+    - name: add new runner zsh
+      become: true
+      lineinfile:
+        path: /etc/shells
+        state: present
+        regexp: '^/usr/local/bin/zsh$'
+        insertafter: '/bin/zsh'
+        line: /usr/local/bin/zsh
+      notify: Change login shell
+      tags:
+        - brew
+        - zsh
+        - dotfile
+
+    - name: change default shell for {{ lookup('env','USER') }}
+      user:
+        name: "{{ lookup('env','USER') }}"
+        shell: /usr/local/bin/zsh
+        append: yes
+      tags:
+        - brew
+        - zsh
+        - dotfile
+
+    # mas install
+    - name: install mas (App Store) packages
+      shell: mas install "{{ item.id }}"
+      with_items: "{{ mas_packages }}"
+      register: ret
+      changed_when: '"already installed" not in ret.stdout'
+      tags:
+        - mas
+
+    # mas upgrade
+    - name: upgrade all mas (App Store) packages
+      shell: mas upgrade
+      register: ret
+      changed_when: '"Everything is up-to-date" not in ret.stdout'
+      tags:
+        - mas
+
+    # composer global install
+    - name: install composer packages
+      composer: command=require global_command=yes arguments="{{ item.name }}"
+      with_items: "{{ composer_packages }}"
+      tags:
+        - composer
+
+    # Download fonts
+    - name: Download fonts
+      get_url:
+        url: "{{ item.url }}"
+        dest: "{{ local_home }}/Library/Fonts"
+        mode: '0644'
+      with_items: "{{ fonts_url }}"
+      notify: run fc-cache
+      tags:
+        - zsh
+        - dotfile
+
+    # install repositories github
+    - name: git clone all repositories
+      git:
+        repo: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items: "{{ repos_git }}"
+      tags:
+        - zsh
+        - dotfile
+
+    - name: Create Symlink for git
+      file:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        force: yes
+        state: link
+      with_items: "{{ git_file }}"
+      tags:
+        - zsh
+        - dotfile
+
+    - name: load antibody
+      shell: antibody bundle < ~/.zsh_plugins.txt > ~/.zsh_plugins.sh 
+      tags:
+        - zsh
+        - dotfile
