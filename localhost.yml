@@ -20,48 +20,55 @@
       - homebrew/cask-fonts
 
     homebrew_packages:
+      - { name: ack }
       - { name: antiword }
+      - { name: composer }
+      - { name: editorconfig }
+      - { name: gcc }
+      - { name: getantibody/tap/antibody }
       - { name: git }
-      - { name: zsh }
-      - { name: zsh-completions }
-      - { name: wget }
-      - { name: tig }
-      - { name: ssh-copy-id }
+      - { name: httpie }
+      - { name: kubernetes-cli }
       - { name: lastpass-cli }
+      - { name: lua }
+      - { name: mas }
+      - { name: php }
+      - { name: ripgrep }
+      - { name: screenfetch }
+      - { name: ssh-copy-id }
+      - { name: tig }
       - { name: tmux }
       - { name: tree }
       - { name: unrar }
-      - { name: composer }
-      - { name: gcc }
-      - { name: mas }
-      - { name: screenfetch }
-      - { name: php }
-      - { name: getantibody/tap/antibody }
-      - { name: httpie }
+      - { name: vim }
+      - { name: wget }
+      - { name: zsh }
+      - { name: zsh-completions }
+      - { name: zsh-syntax-highlighting }
 
     homebrew_cask_packages:
-      - alfred
-      - appcleaner
-      - vagrant
-      - virtualbox
-      - virtualbox-extension-pack
-      - jetbrains-toolbox
-      - visual-studio-code
-      - vlc
-      - docker
-      - libreoffice
-      - google-backup-and-sync
-      - google-chrome
-      - google-drive-file-stream
-      - firefox
-      - tunnelblick
-      - postman
-      - iterm2
-      - bettertouchtool
-      - skype
-      - slack
-      - lastpass
-      - font-hack-nerd-font
+      - { name: alfred }
+      - { name: appcleaner }
+      - { name: bettertouchtool }
+      - { name: docker }
+      - { name: firefox }
+      - { name: font-hack-nerd-font }
+      - { name: google-backup-and-sync }
+      - { name: google-chrome }
+      - { name: google-drive-file-stream }
+      - { name: iterm2 }
+      - { name: jetbrains-toolbox }
+      - { name: postman }
+      - { name: lastpass }
+      - { name: libreoffice }
+      - { name: slack }
+      - { name: skype }
+      - { name: tunnelblick }
+      - { name: vagrant }
+      - { name: virtualbox }
+      - { name: virtualbox-extension-pack }
+      - { name: visual-studio-code }
+      - { name: vlc }
 
     mas_packages:
       - { name: Wunderlist, id: 410628904 }
@@ -128,7 +135,7 @@
       args:
         creates: "{{ local_home }}/.nvm/nvm.sh"
       tags:
-        - brew
+        - nvm
 
     # brew tap
     - name: install taps of homebrew
@@ -145,7 +152,7 @@
 
     # brew cask install
     - name: install homebrew cask packages
-      homebrew_cask: name="{{ item }}" state=present
+      homebrew_cask: name="{{ item.name }}" state="{{ item.state | default('present') }}"
       with_items: "{{ homebrew_cask_packages }}"
       ignore_errors: true
       tags:
@@ -153,7 +160,10 @@
 
     # brew install
     - name: install homebrew packages
-      homebrew: name="{{ item.name }}" state="{{ item.state|default('latest') }}" install_options="{{ item.install_options|default() }}"
+      homebrew:
+        name: "{{ item.name }}"
+        state: "{{ item.state | default('latest') }}"
+        install_options: "{{ item.install_options|default() }}"
       with_items: "{{ homebrew_packages }}"
       tags:
         - brew
@@ -242,6 +252,13 @@
 
     - name: load antibody
       shell: antibody bundle < ~/.zsh_plugins.txt > ~/.zsh_plugins.sh 
+      tags:
+        - zsh
+        - dotfile
+
+    - name: Install Pygments for zsh-syntax-highlighting
+      pip:
+        name: Pygments
       tags:
         - zsh
         - dotfile
