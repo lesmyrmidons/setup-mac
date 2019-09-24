@@ -45,6 +45,7 @@
       - { name: zsh }
       - { name: zsh-completions }
       - { name: zsh-syntax-highlighting }
+      - { name: thefuck }
 
     homebrew_cask_packages:
       - { name: alfred }
