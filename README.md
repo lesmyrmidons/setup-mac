@@ -33,6 +33,6 @@ $ ansible-playbook -i inventory localhost.yml -K
 
 ### Ansible commands
 ```
-$ ansible-playbook -i inventory localhost.yml -K --tags {brew,cask}
+$ ansible-playbook -i inventory localhost.yml -K --tags "brew,cask"
 $ ansible-playbook -i inventory localhost.yml -K --tags zsh
 ```

@@ -5,7 +5,6 @@
   vars:
     local_home: "{{ lookup('env','HOME') }}"
     mas_signin_dialog: true
-    extra_path: $HOME/.phpenv/bin
 
     repos_git:
       - { src: "https://github.com/lesmyrmidons/dotfiles.git", dest: "~/.setup/dotfile" }
@@ -27,15 +26,21 @@
       - { name: gcc }
       - { name: getantibody/tap/antibody }
       - { name: git }
+      - { name: helm }
       - { name: httpie }
+      - { name: kubectl }
+      - { name: kubectx }
       - { name: kubernetes-cli }
       - { name: lastpass-cli }
       - { name: lua }
       - { name: mas }
+      - { name: mysql-client }
       - { name: php }
+      - { name: pwgen }
       - { name: ripgrep }
       - { name: screenfetch }
       - { name: ssh-copy-id }
+      - { name: thefuck }
       - { name: tig }
       - { name: tmux }
       - { name: tree }
@@ -45,7 +50,6 @@
       - { name: zsh }
       - { name: zsh-completions }
       - { name: zsh-syntax-highlighting }
-      - { name: thefuck }
 
     homebrew_cask_packages:
       - { name: alfred }
@@ -59,11 +63,13 @@
       - { name: google-drive-file-stream }
       - { name: iterm2 }
       - { name: jetbrains-toolbox }
-      - { name: postman }
       - { name: lastpass }
       - { name: libreoffice }
+      - { name: minikube }
+      - { name: postman }
       - { name: slack }
       - { name: skype }
+      - { name: steveschow-gfxcardstatus }
       - { name: tunnelblick }
       - { name: vagrant }
       - { name: virtualbox }
@@ -151,14 +157,6 @@
       tags:
         - brew
 
-    # brew cask install
-    - name: install homebrew cask packages
-      homebrew_cask: name="{{ item.name }}" state="{{ item.state | default('present') }}"
-      with_items: "{{ homebrew_cask_packages }}"
-      ignore_errors: true
-      tags:
-        - cask
-
     # brew install
     - name: install homebrew packages
       homebrew:
@@ -168,6 +166,14 @@
       with_items: "{{ homebrew_packages }}"
       tags:
         - brew
+
+    # brew cask install
+    - name: install homebrew cask packages
+      homebrew_cask: name="{{ item.name }}" state="{{ item.state | default('present') }}"
+      with_items: "{{ homebrew_cask_packages }}"
+      ignore_errors: true
+      tags:
+        - cask
 
     # configure zsh
     - name: add new runner zsh
@@ -235,6 +241,7 @@
       git:
         repo: "{{ item.src }}"
         dest: "{{ item.dest }}"
+        force: yes
       with_items: "{{ repos_git }}"
       tags:
         - zsh
