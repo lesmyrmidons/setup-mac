@@ -1,7 +1,7 @@
 # setup-mac
-My Mac (Mojave) Set Up
+My Mac (Mojave and more) Set Up
 
-The following is the automated installation/set-up for my MacOS (Mojave) computer after updating or resetting it.
+The following is the automated installation/set-up for my MacOS (Mojave and more) computer after updating or resetting it.
 It does install all the apps i use daily, like JetBrains, Docker, Postaman and so on.
 It does also set the configuration for my zsh and dotfile plugins (git configuration, zsh aliases, fonts ...etc) and soon it will also set my new Vim configuration.
 Everything is based on Homebrew package manager.
