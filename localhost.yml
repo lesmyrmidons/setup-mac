@@ -23,6 +23,7 @@
       - { name: antiword }
       - { name: composer }
       - { name: editorconfig }
+      - { name: fontconfig }
       - { name: gcc }
       - { name: getantibody/tap/antibody }
       - { name: git }
@@ -206,6 +207,7 @@
       with_items: "{{ mas_packages }}"
       register: ret
       changed_when: '"already installed" not in ret.stdout'
+      ignore_errors: true
       tags:
         - mas
 
