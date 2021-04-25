@@ -21,6 +21,7 @@
     homebrew_packages:
       - { name: ack }
       - { name: antiword }
+      - { name: azure-cli }
       - { name: composer }
       - { name: editorconfig }
       - { name: fontconfig }
@@ -31,7 +32,9 @@
       - { name: httpie }
       - { name: kubectl }
       - { name: kubectx }
+      - { name: kubeseal }
       - { name: kubernetes-cli }
+      - { name: k3d }
       - { name: lastpass-cli }
       - { name: lua }
       - { name: mas }
@@ -41,6 +44,7 @@
       - { name: ripgrep }
       - { name: screenfetch }
       - { name: ssh-copy-id }
+      - { name: stern }
       - { name: thefuck }
       - { name: tig }
       - { name: tmux }
@@ -154,7 +158,9 @@
 
     # brew update
     - name: update homebrew
-      homebrew: update_homebrew=yes
+      homebrew:
+        update_homebrew: yes
+        upgrade_all: yes
       tags:
         - brew
 
@@ -178,7 +184,7 @@
 
     # configure zsh
     - name: add new runner zsh
-      become: true
+      become: yes
       lineinfile:
         path: /etc/shells
         state: present
@@ -187,7 +193,6 @@
         line: /usr/local/bin/zsh
       notify: Change login shell
       tags:
-        - brew
         - zsh
         - dotfile
 
@@ -197,7 +202,6 @@
         shell: /usr/local/bin/zsh
         append: yes
       tags:
-        - brew
         - zsh
         - dotfile
 
