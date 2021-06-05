@@ -30,6 +30,7 @@
       - { name: git }
       - { name: helm }
       - { name: httpie }
+      - { name: joplin }
       - { name: kubectl }
       - { name: kubectx }
       - { name: kubeseal }
@@ -49,7 +50,7 @@
       - { name: tig }
       - { name: tmux }
       - { name: tree }
-      - { name: unrar }
+#      - { name: unrar } # Missing with MacOS BigSur 
       - { name: vim }
       - { name: wget }
       - { name: zsh }
@@ -70,7 +71,7 @@
       - { name: jetbrains-toolbox }
       - { name: lastpass }
       - { name: libreoffice }
-      - { name: minikube }
+#      - { name: minikube }  # Missing with MacOS BigSur
       - { name: postman }
       - { name: slack }
       - { name: skype }
